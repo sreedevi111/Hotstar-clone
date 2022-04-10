@@ -10,6 +10,13 @@ function Header() {
             <img src='/images/home-icon.svg'/>
             <span>HOME</span>
           </a>
+
+          <a>
+            <img src='/images/home-icon.svg'/>
+            <span>HOME</span>
+          </a>
+
+          
       </NavMenu>
    </Nav>
   )
@@ -31,5 +38,19 @@ const Logo = styled.img`
 `
 
 const NavMenu = styled.div`
+display:flex;
+a{
+  display:flex;
+  align-items:center;
+  padding: 0 12px;
+
+  img{
+    height:20px;
+  }
+  span{
+    font-size:13px;
+    letter-spacing: 1.42px;
+  }
+}
 
 `
