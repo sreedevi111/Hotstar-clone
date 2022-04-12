@@ -1,101 +1,201 @@
-import React from 'react'
-import styled from 'styled-components'
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { auth, signInWithGoogle } from "../firebase";
+import {
+  selectUserName,
+  setUserLogin,
+  setSignOut,
+} from "../features/User/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+// useDispatch returns reference to dispatch function from the redux-store
+// useSelector allows to extract data from redux store
+import { useNavigate } from "react-router-dom";
+
 
 function Header() {
+  const dispatch = useDispatch();
+  const history = useNavigate();
+  const userName = useSelector(selectUserName);
+
+//displays the user details on loading the page if user is present
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        dispatch(
+          setUserLogin({
+            name: user.displayName,
+            email: user.email,
+            photo: user.photoURL,
+          })
+        );
+        history("/");
+      }
+    });
+  }, []);
+
+  //sign in =>google and sets the userdetails
+  const signIn = () => {
+    signInWithGoogle().then((result) => {
+      let user = result.user;
+      dispatch(
+        setUserLogin({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+        })
+      );
+      history("/");
+    });
+  };
+//if sign out the user details is set to null and navigates to login page
+  const signOut = () => {
+    auth.signOut().then(() => {
+      dispatch(setSignOut);
+      history("/login");
+      window.location.reload();
+    });
+  };
+
   return (
-   <Nav>
-      <Logo src = "/images/logo.svg"/>
-      <NavMenu>
-          <a>
-            <img src='/images/home-icon.svg'/>
-            <span>HOME</span>
-          </a>
+    //added imdb logo and icons
+    //if not user login is displayed else the icons
+    <Nav>
+      <Logo src="https://eyeinkfx.com/wp-content/uploads/2019/10/ICON-imdb.png" />
+     
+     
+      {!userName ? (
+        <LoginConatiner>
+          <Login onClick={signIn}>LOGIN</Login>
 
-          <a>
-            <img src='/images/search-icon.svg'/>
-            <span>SEARCH</span>
-          </a>
+        </LoginConatiner>
+      ) : (
+        <>
+          <NavMenu>
+            <a>
+              <img src="/images/home-icon.svg" />
+              <Link to="/" style={{ textDecoration: "none" }}>
+                <span>HOME</span>
+              </Link>
+            </a>
 
-          <a>
-            <img src='/images/watchlist-icon.svg'/>
-            <span>WATCHLIST</span>
-          </a>
+            <a>
+              <img src="/images/search-icon.svg" />
+              <span>SEARCH</span>
+            </a>
+            <a>
+              <img src="/images/movie-icon.svg" />
+              <span>MOVIES</span>
+            </a>
+            <a>
+              <img src="/images/series-icon.svg" />
+              <span>SERIES</span>
+            </a>
+            <a>
+              <img src="/images/watchlist-icon.svg" />
+              <span>WATCHLIST</span>
+            </a>
+          </NavMenu>
 
-          <a>
-            <img src='/images/original-icon.svg'/>
-            <span>ORIGINALS</span>
-          </a>
+          {/* added userimage */}
 
-          <a>
-            <img src='/images/movie-icon.svg'/>
-            <span>MOVIES</span>
-          </a>
-
-          <a>
-            <img src='/images/series-icon.svg'/>
-            <span>SERIES</span>
-          </a>
-
-
-      </NavMenu>
-      <UserImg src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIEAAACBCAMAAADQfiliAAAANlBMVEWVu9////+QuN6Mtt3K3O7j7Pby9vvE2OyavuCvy+akxOPY5fLp8Pj6/P260umqyOWFstvR4PDphOmSAAADqElEQVR4nO1b27KiMBCECbkCgfz/zy43dT0HyTRmdGuLfrJKyzSTuXZIVV24cOFCARCpGURfWVy54G3TzmisD059lMb00LE19d8wOlafs8UY2noPbRg/sj45vbv+DO0+YAayL9efYcUp0GsDbGYQpqBMhsDkk0qSAHVZAnXdCVqB9mPgJ1oxChRZBOo6ilHomQx6ofVVYhKo6yTjjcQmUNci20ANwKARoZBPBQ8YCQIDQKCuh/IEoE0Q2YZsQXiGQHlwiBtMjuCKM8DcQMIRPMjAlyZAKIPitSHTGn2CARaMAuF4MTjhB8WbZnZ/dEN5T4TzQfG0/P2cGLhN4oo+FGfw/crEGlYeEBhbFG9auUGX75bBcJQYWgLEoLwjVvyJaYbI1AQ1iiIqwj8wsSCOIOIG1QgwkBHVCJidhQQEfnESmNkWMGSsFWJiFrtPEhQVeUYQqIs3KJ4RRHVVjhFE1IsbWAVSTsubMeb7lE5Y4ne5CtnLueGK7D7I7sFC4dvnC1NIHlXpRlTav1N4vRFRnMBqYvL7acFsk5rcRlBl1fZhr1CnbWllZTiQctPE0G5mVi49h2Wf3PbVOP+s+AEoqSquueh+fkI0JG1mGr3RaXicdq6TTRerciSmp/f6vvOde3Ag50IIztF9fXL3pGm0L2OJ6VnbJ4P3/rXDq/j803Z4+ySYyP72ex32Oajwe6Qw9j07kN8vA3r49b+TrfZHmv4dNeVgSOma4GZPWFG50LyumufHl8zRltGtjd77aFt93LmcPfiCBbzXOFmvsHH9GKeaBvBQ5RinZmlUvjvGiSlKlTTBKV0J1A9zwPXFgoGwAg6HERMw8zBoE+8KE4ADEhbz8wDbeEAv4QLUVUAVmQNQaUbeduACY1A2Ia6A0mLxbDADygiglM9DCyXm8o44uSJCADzS4QESuEo2Jw8AxQk+XOQBaJpFQgEKBpFQgIJBSYTCFAx8BiQRClMw8HchK9mdAyD0Fe4R7wz44SgTjMAbQkLpAEgIAi3aCnajJpSQgJQEv3fDBVtIEEqJQFK8GEAvJmNgqznfj8ay8skDkJCSyleGPgHrz9r5jpb6Dox1qIpCozsQKTF0jRtP6XlEzma0yjyMtu4deZuUG5ruLAvTNUMJhZ9UNfy8wsVYvY1DwUOO5Q5dsElzQqTXyQaZ+3aLij7EpDuzx6Q3nU7TgxMJX3AjtZzuDD42KS13+1Jqoh+W056P3vCbH1Wp7YLjd644Xrhw4T/DHzhTKer8tGZTAAAAAElFTkSuQmCC'/>
-   </Nav>
-  )
+          <UserImage
+            onClick={signOut}
+            src="https://www.disneyplusinformer.com/wp-content/uploads/2021/12/Encanto-Avatar.png"
+          />
+        </>
+      )}
+    </Nav>
+  );
 }
 
-export default Header
+export default Header;
+
+//style
 
 const Nav = styled.nav`
-height: 70px;
-  background: #090b13;
+  height: 70px;
+  background: #0d1a26;
   display: flex;
   align-items: center;
-  padding: 0 36px;
+  justify-content: center;
+  padding: 0 35px;
   overflow-x: hidden;
-`
-
+  z-index: 3;
+`;
 const Logo = styled.img`
-    width: 80px;
-
-`
-
+  width: 80px;
+`;
 const NavMenu = styled.div`
-display:flex;
-flex:1;
-margin-left: 20px;
-align-items: center;
-a{
-  display:flex;
-  align-items:center;
-  padding: 0 12px;
-  cursor: pointer;
+  dislpay: flex;
+  flex: 1;
+  margin-left: 20px;
+  align-items: center;
 
-  img{
-    height:20px;
-  }
-  span{
-    font-size:13px;
-    letter-spacing: 1.42px;
-    position: relative;
+  a {
+    display: inline;
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
 
-    &:after{
-      content: "";
-      height: 2px:
-      background: white;
-      position: absolute;
-      top: 0;
-      left:0;
-      right: 0;
-      bottom: -6px;
+    img {
+      
+      height: 20px;
+      color: white;
+    }
+    span {
+      font-size: 13px;
+      letter-spacing: 1.42px;
+      position: relative;
+      color: white;
+
+      //inserts something after the content of each selected element
+      &:after {
+        content: "";
+        height: 2px;
+        background: white;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -6px;
+        opacity: 0;
+        transform-origin: left center;
+        //transition : selector duration timing-function delay
+        transition: all 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s;
+        transform: scaleX(0);
+      }
+    }
+
+    &:hover {
+      span:after {
+        transform: scaleX(1);
+        opacity: 1;
+      }
     }
   }
-}
-
-`
-
-const UserImg = styled.img`
-  width: 48px;
-  height:48px;
-  border-radius:50px;
+`;
+const UserImage = styled.img`
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
   cursor: pointer;
-`
+`;
+
+const Login = styled.div`
+  border: 1px solid #f9f9f9;
+  padding: 8px 16px;
+  border-radius: 4px;
+  letter-spacing: 1.5px;
+  transitio: all 0.2w ease 0s;
+  &:hover {
+    background: rgb(198, 198, 198);
+
+    color: #000;
+    border-color: transparent;
+  }
+`;
+const LoginConatiner = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+`;
