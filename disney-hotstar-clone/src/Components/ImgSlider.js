@@ -1,26 +1,27 @@
-import React from 'react'
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
+//react slick: library for creating carousels
+//slick carousel :A slideshow component for cycling through elements—images or slides of text—like a carousel.
 import "slick-carousel/slick/slick.css";
-// carousel is a slideshow for cycling through a series of content
 import "slick-carousel/slick/slick-theme.css";
-import Slider from 'react-slick'
-// to create carousel
+import Slider from "react-slick";
 
-function ImgSlider() {
-
-    let settings = {
-        dots: true,
-        // to show dots 
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll:1,
-        autoplay: true,
-    }
+function ImageSlider() {
+  let settings = {
+    //to show dots
+    dots: true,
+    //slide duratiom
+    speed: 500,
+    slidesToShow: 1,
+    //to show infinitely
+    infinite: true,
+    slidesToScroll: 1,
+    autoplay: true,
+  };
 
   return (
-    <Corousel {...settings}>
-        <Wrap>
+    <Carousel {...settings}>
+      <Wrap>
         <img src="/images/slider-badag.jpg" alt="" />
       </Wrap>
       <Wrap>
@@ -32,15 +33,15 @@ function ImgSlider() {
       <Wrap>
         <img src="/images/slider-scales.jpg" alt="" />
       </Wrap>
-     </Corousel>
+    </Carousel>
   );
 }
 
-export default ImgSlider
+export default ImageSlider;
 
-const Corousel = styled(Slider)`
- margin-top: 15px;
- ul li button {
+const Carousel = styled(Slider)`
+  margin-top: 20px;
+  ul li button {
     &:before {
       font-size: 10px;
       color: rgb(150, 158, 171);
@@ -52,15 +53,12 @@ const Corousel = styled(Slider)`
   }
   .slick-list {
     overflow: visible;
-    // to show little of adjacent pic
   }
   button {
     z-index: 1;
   }
-`
-
+`;
 const Wrap = styled.div`
-  cursor: pointer;
   img {
     border: 4px solid transparent;
     width: 100%;
