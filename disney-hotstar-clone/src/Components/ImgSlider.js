@@ -1,8 +1,10 @@
 import React from 'react'
 import styled from 'styled-components';
 import "slick-carousel/slick/slick.css";
+// carousel is a slideshow for cycling through a series of content
 import "slick-carousel/slick/slick-theme.css";
 import Slider from 'react-slick'
+// to create carousel
 
 function ImgSlider() {
 
@@ -58,6 +60,7 @@ const Corousel = styled(Slider)`
 `
 
 const Wrap = styled.div`
+  cursor: pointer;
   img {
     border: 4px solid transparent;
     width: 100%;
